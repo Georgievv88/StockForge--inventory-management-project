@@ -33,6 +33,7 @@ const productSchema = new mongoose.Schema(
     },
 
     quantity: {
+      validate: Number.isSafeInteger,
       type: Number,
       required: true,
       min: 0,
@@ -40,6 +41,7 @@ const productSchema = new mongoose.Schema(
     },
 
     lowStockThreshold: {
+      validate: Number.isSafeInteger,
       type: Number,
       default: 5,
       min: 0,

@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/api";
 import { useState } from "react";
 
 const emptyForm = {
@@ -34,7 +35,7 @@ function AddProduct({ onProductAdded, onCancel }) {
       lowStockThreshold: Number(form.lowStockThreshold),
     };
     try {
-      const response = await fetch("http://localhost:5000/api/products", {
+      const response = await apiFetch("/products", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +59,7 @@ function AddProduct({ onProductAdded, onCancel }) {
   }
 
   return (
-    <div className="mt-6 rounded-xl border border-slate-700 bg-slate-900 p-6">
+    <div className="mt-6 rounded-xl border border-line-strong bg-surface p-6">
       <h2 className="mb-5 text-xl font-semibold">Add New Product</h2>
 
       <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
@@ -77,7 +78,7 @@ function AddProduct({ onProductAdded, onCancel }) {
           <div key={field.name}>
             <label
               htmlFor={field.name}
-              className="mb-2 block text-sm text-slate-300"
+              className="mb-2 block text-sm text-muted"
             >
               {field.label}
             </label>
@@ -97,7 +98,7 @@ function AddProduct({ onProductAdded, onCancel }) {
               }
               value={form[field.name]}
               onChange={handleChange}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+              className="w-full rounded-lg border border-line-strong bg-raised px-4 py-3 text-ink outline-none focus:border-accent"
             />
           </div>
         ))}
@@ -105,7 +106,7 @@ function AddProduct({ onProductAdded, onCancel }) {
         <div className="sm:col-span-2">
           <label
             htmlFor="category"
-            className="mb-2 block text-sm text-slate-300"
+            className="mb-2 block text-sm text-muted"
           >
             Category
           </label>
@@ -115,7 +116,7 @@ function AddProduct({ onProductAdded, onCancel }) {
             name="category"
             value={form.category}
             onChange={handleChange}
-            className="w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white"
+            className="w-full rounded-lg border border-line-strong bg-raised px-4 py-3 text-ink"
           >
             {[
               "Graphics Cards",
@@ -126,6 +127,7 @@ function AddProduct({ onProductAdded, onCancel }) {
               "Power Supplies",
               "Cases",
               "Cooling",
+              "Peripherals",
               "Other",
             ].map((category) => (
               <option key={category}>{category}</option>
@@ -134,7 +136,7 @@ function AddProduct({ onProductAdded, onCancel }) {
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-400 sm:col-span-2">
+          <p role="alert" className="text-sm text-danger sm:col-span-2">
             {error}
           </p>
         )}
@@ -143,7 +145,7 @@ function AddProduct({ onProductAdded, onCancel }) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-lg bg-blue-600 px-6 py-3 font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg bg-brand px-6 py-3 font-medium hover:bg-brand-hover disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Product"}
           </button>
@@ -151,7 +153,7 @@ function AddProduct({ onProductAdded, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-lg border border-slate-700 px-6 py-3 hover:bg-slate-800"
+            className="rounded-lg border border-line-strong px-6 py-3 hover:bg-raised"
           >
             Cancel
           </button>

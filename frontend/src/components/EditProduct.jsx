@@ -1,3 +1,4 @@
+import { apiFetch } from "../lib/api";
 import { useState } from "react";
 
 function EditProduct({ product, onProductUpdated, onCancel }) {
@@ -28,6 +29,7 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
 
     const updatedProduct = {
       ...form,
+      expectedVersion: product.__v || 0,
       cost: Number(form.cost),
       price: Number(form.price),
       quantity: Number(form.quantity),
@@ -35,16 +37,13 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/products/${product._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedProduct),
+      const response = await apiFetch(`/products/${product._id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(updatedProduct),
+      });
 
       const data = await response.json();
 
@@ -61,10 +60,10 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
   }
 
   const inputStyle =
-    "w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500";
+    "w-full rounded-lg border border-line-strong bg-raised px-4 py-3 text-ink outline-none focus:border-accent";
 
   return (
-    <div className="mt-6 rounded-xl border border-slate-700 bg-slate-900 p-6">
+    <div className="mt-6 rounded-xl border border-line-strong bg-surface p-6">
       <h2 className="mb-5 text-xl font-semibold">Edit Product</h2>
 
       <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
@@ -83,7 +82,7 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
           <div key={field.name}>
             <label
               htmlFor={`edit-${field.name}`}
-              className="mb-2 block text-sm text-slate-300"
+              className="mb-2 block text-sm text-muted"
             >
               {field.label}
             </label>
@@ -129,6 +128,7 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
               "Power Supplies",
               "Cases",
               "Cooling",
+              "Peripherals",
               "Other",
             ].map((category) => (
               <option key={category} value={category}>
@@ -139,7 +139,7 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-400 sm:col-span-2">
+          <p role="alert" className="text-sm text-danger sm:col-span-2">
             {error}
           </p>
         )}
@@ -148,7 +148,7 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-lg bg-blue-600 px-6 py-3 font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="rounded-lg bg-brand px-6 py-3 font-medium hover:bg-brand-hover disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -157,7 +157,7 @@ function EditProduct({ product, onProductUpdated, onCancel }) {
             type="button"
             onClick={onCancel}
             disabled={saving}
-            className="rounded-lg border border-slate-700 px-6 py-3 hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-lg border border-line-strong px-6 py-3 hover:bg-raised disabled:opacity-50"
           >
             Cancel
           </button>

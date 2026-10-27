@@ -1,11 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Package } from "lucide-react";
 import { useState } from "react";
 
+import { apiJson } from "../lib/api";
+
 function Register() {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: "",
-    email: "",
+    token: params.get("token") || "",
     password: "",
     confirmPassword: "",
   });
@@ -19,36 +24,57 @@ function Register() {
     });
     setError("");
   }
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords dont match.");
       return;
     }
-    if (form.password.length < 8) {
-      setError("Password must be at least 8 characters");
+    if (
+      form.password.length < 12 ||
+      new TextEncoder().encode(form.password).length > 72
+    ) {
+      setError(
+        "Password must be at least 12 characters and at most 72 UTF-8 bytes",
+      );
       return;
     }
     setError("");
-    console.log("Registration validated");
+    setSaving(true);
+    try {
+      await apiJson("/auth/accept-invitation", {
+        method: "POST",
+        body: JSON.stringify({
+          token: form.token.trim(),
+          name: form.name,
+          password: form.password,
+        }),
+      });
+      navigate("/login", { replace: true, state: { registered: true } });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   }
   const inputStyle =
-    "w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-3 outline-none focus:border-blue-500";
+    "w-full rounded-lg border border-line-strong bg-raised px-4 py-3 outline-none focus:border-accent";
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-white">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-10 text-ink">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2">
-          <Package size={32} className="text-blue-500" />
+          <Package size={32} className="text-accent" />
           <span className="text-3xl font-bold">StockForge</span>
         </Link>
 
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
+        <div className="rounded-xl border border-line bg-surface p-8 shadow-xl">
           <h1 className="text-2xl font-bold">Create an account</h1>
 
-          <p className="mt-2 text-sm text-slate-400">
-            Start managing your inventory with StockForge.
+          <p className="mt-2 text-sm text-muted">
+            Use the invitation link or code from your administrator. Your
+            account uses the email they invited.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -69,17 +95,17 @@ function Register() {
             </div>
 
             <div>
-              <label htmlFor="register-email" className="mb-2 block text-sm">
-                Email Address
+              <label htmlFor="invitation-token" className="mb-2 block text-sm">
+                Invitation Code
               </label>
               <input
-                id="register-email"
-                name="email"
-                type="email"
+                id="invitation-token"
+                name="token"
+                type="text"
                 required
-                autoComplete="email"
-                placeholder="you@example.com"
-                value={form.email}
+                autoComplete="off"
+                placeholder="Paste your invitation code"
+                value={form.token}
                 onChange={handleChange}
                 className={inputStyle}
               />
@@ -94,9 +120,9 @@ function Register() {
                 name="password"
                 type="password"
                 required
-                minLength={8}
+                minLength={12}
                 autoComplete="new-password"
-                placeholder="At least 8 characters"
+                placeholder="At least 12 characters"
                 value={form.password}
                 onChange={handleChange}
                 className={inputStyle}
@@ -121,22 +147,23 @@ function Register() {
             </div>
 
             {error && (
-              <p role="alert" className="text-sm text-red-400">
+              <p role="alert" className="text-sm text-danger">
                 {error}
               </p>
             )}
 
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-blue-600 py-3 font-semibold transition hover:bg-blue-700"
+              disabled={saving}
+              className="w-full cursor-pointer rounded-lg bg-brand py-3 font-semibold transition hover:bg-brand-hover"
             >
-              Create Account
+              {saving ? "Creating account..." : "Create Account"}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-400">
+          <p className="mt-6 text-center text-sm text-muted">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-400 hover:underline">
+            <Link to="/login" className="text-accent hover:underline">
               Sign in
             </Link>
           </p>
@@ -144,7 +171,7 @@ function Register() {
 
         <Link
           to="/"
-          className="mt-6 block text-center text-sm text-slate-400 hover:text-white"
+          className="mt-6 block text-center text-sm text-muted hover:text-ink"
         >
           ← Back to Home
         </Link>

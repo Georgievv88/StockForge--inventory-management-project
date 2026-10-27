@@ -1,3 +1,6 @@
+import InviteUser from "../components/InviteUser";
+import { useAuth } from "../auth/context";
+import { apiFetch } from "../lib/api";
 import { useState, useEffect } from "react";
 import { Package, Boxes, AlertTriangle, Wallet } from "lucide-react";
 import Sidebar from "../components/Sidebar";
@@ -5,6 +8,7 @@ import DashboardHeader from "../components/DashboardHeader";
 import StatCard from "../components/StatCard";
 
 function Dashboard() {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -14,7 +18,7 @@ function Dashboard() {
 
     async function fetchProducts() {
       try {
-        const response = await fetch("http://localhost:5000/api/products", {
+        const response = await apiFetch("/products", {
           signal: controller.signal,
         });
 
@@ -64,16 +68,17 @@ function Dashboard() {
     }).format(value);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white lg:flex">
+    <div className="min-h-screen bg-canvas text-ink lg:flex">
       <Sidebar />
 
       <main className="min-w-0 flex-1 p-5 md:p-8">
         <DashboardHeader />
+        {user.role === "admin" && <InviteUser />}
 
-        {loading && <p className="mt-5 text-blue-400">Loading dashboard...</p>}
+        {loading && <p className="mt-5 text-accent">Loading dashboard...</p>}
 
         {error && (
-          <p role="alert" className="mt-5 text-red-400">
+          <p role="alert" className="mt-5 text-danger">
             {error}
           </p>
         )}
@@ -102,12 +107,12 @@ function Dashboard() {
               />
             </div>
 
-            <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900 p-6">
+            <div className="mt-8 rounded-xl border border-line bg-surface p-6">
               <h2 className="text-xl font-semibold">Recent Products</h2>
 
               <div className="mt-5 overflow-x-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="border-b border-slate-700 text-slate-400">
+                  <thead className="border-b border-line-strong text-muted">
                     <tr>
                       <th className="p-4">Product</th>
                       <th className="p-4">SKU</th>
@@ -126,11 +131,11 @@ function Dashboard() {
                       .map((product) => (
                         <tr
                           key={product._id}
-                          className="border-b border-slate-800 hover:bg-slate-800/50"
+                          className="border-b border-line hover:bg-raised/50"
                         >
                           <td className="p-4 font-medium">{product.name}</td>
 
-                          <td className="p-4 text-slate-400">{product.sku}</td>
+                          <td className="p-4 text-muted">{product.sku}</td>
 
                           <td className="p-4">{product.category}</td>
 
@@ -145,7 +150,7 @@ function Dashboard() {
                 </table>
 
                 {products.length === 0 && (
-                  <p className="py-8 text-center text-slate-400">
+                  <p className="py-8 text-center text-muted">
                     No products in the database yet.
                   </p>
                 )}

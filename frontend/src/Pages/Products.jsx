@@ -1,10 +1,16 @@
+import { apiFetch } from "../lib/api";
 import { useState, useEffect } from "react";
 import { Search, Plus, Pencil, Trash2 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import AddProduct from "../components/AddProduct";
 import EditProduct from "../components/EditProduct";
 
+import { useAuth } from "../auth/context";
+
 function Products() {
+  const { user } = useAuth();
+  const canManage = ["admin", "staff"].includes(user.role);
+  const canDelete = user.role === "admin";
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
@@ -19,7 +25,7 @@ function Products() {
 
     async function fetchProducts() {
       try {
-        const response = await fetch("http://localhost:5000/api/products", {
+        const response = await apiFetch("/products", {
           signal: controller.signal,
         });
 
@@ -75,12 +81,9 @@ function Products() {
     setError("");
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/products/${product._id}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const response = await apiFetch(`/products/${product._id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         const data = await response.json();
@@ -126,25 +129,25 @@ function Products() {
     if (product.quantity === 0) {
       return {
         label: "Out of Stock",
-        style: "text-red-400",
+        style: "text-danger",
       };
     }
 
     if (product.quantity <= product.lowStockThreshold) {
       return {
         label: "Low Stock",
-        style: "text-yellow-400",
+        style: "text-warning",
       };
     }
 
     return {
       label: "In Stock",
-      style: "text-green-400",
+      style: "text-success",
     };
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white lg:flex">
+    <div className="min-h-screen bg-canvas text-ink lg:flex">
       <Sidebar />
 
       <main className="min-w-0 flex-1 p-5 md:p-8">
@@ -152,22 +155,24 @@ function Products() {
           <div>
             <h1 className="text-3xl font-bold">Products</h1>
 
-            <p className="mt-2 text-slate-400">
+            <p className="mt-2 text-muted">
               View and manage your inventory products.
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setEditingProduct(null);
-              setShowAddForm(true);
-            }}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-medium hover:bg-blue-700"
-          >
-            <Plus size={20} />
-            Add Product
-          </button>
+          {canManage && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditingProduct(null);
+                setShowAddForm(true);
+              }}
+              className="flex items-center gap-2 rounded-lg bg-brand px-5 py-3 font-medium hover:bg-brand-hover"
+            >
+              <Plus size={20} />
+              Add Product
+            </button>
+          )}
         </div>
 
         {showAddForm && (
@@ -186,24 +191,25 @@ function Products() {
           />
         )}
 
-        <div className="mt-8 rounded-xl border border-slate-800 bg-slate-900 p-6">
+        <div className="mt-8 rounded-xl border border-line bg-surface p-4 sm:p-6">
           <div className="flex flex-wrap gap-4">
-            <div className="flex min-w-52 flex-1 items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-4">
-              <Search size={20} className="text-slate-400" />
+            <div className="flex min-w-0 w-full sm:min-w-52 flex-1 items-center gap-2 rounded-lg border border-line-strong bg-raised px-4">
+              <Search size={20} className="text-muted" />
 
               <input
                 type="text"
                 placeholder="Search products or SKU..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full py-3 outline-none"
+                className="min-w-0 w-full py-3 outline-none"
               />
             </div>
 
             <select
+              aria-label="Filter by category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-3"
+              className="w-full sm:w-auto min-w-0 rounded-lg border border-line-strong bg-raised px-4 py-3"
             >
               {categories.map((item) => (
                 <option key={item} value={item}>
@@ -214,22 +220,22 @@ function Products() {
           </div>
 
           {error && (
-            <p role="alert" className="mt-5 text-sm text-red-400">
+            <p role="alert" className="mt-5 text-sm text-danger">
               Error: {error}
             </p>
           )}
 
           {loading ? (
-            <p className="mt-5 text-blue-400">Loading products...</p>
+            <p className="mt-5 text-accent">Loading products...</p>
           ) : (
-            <p className="mt-5 text-sm text-slate-400">
+            <p className="mt-5 text-sm text-muted">
               Showing {filteredProducts.length} of {products.length} products
             </p>
           )}
 
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-700 text-slate-400">
+            <table className="mobile-cards w-full text-left text-sm">
+              <thead className="border-b border-line-strong text-muted">
                 <tr>
                   <th className="p-4">Product</th>
                   <th className="p-4">SKU</th>
@@ -237,7 +243,7 @@ function Products() {
                   <th className="p-4">Price</th>
                   <th className="p-4">Quantity</th>
                   <th className="p-4">Status</th>
-                  <th className="p-4">Actions</th>
+                  {canManage && <th className="p-4">Actions</th>}
                 </tr>
               </thead>
 
@@ -249,50 +255,64 @@ function Products() {
                     return (
                       <tr
                         key={product._id}
-                        className="border-b border-slate-800 hover:bg-slate-800/50"
+                        className="border-b border-line hover:bg-raised/50"
                       >
-                        <td className="p-4 font-medium">{product.name}</td>
+                        <td data-label="Product" className="p-4 font-medium">
+                          {product.name}
+                        </td>
 
-                        <td className="p-4 text-slate-400">{product.sku}</td>
+                        <td data-label="SKU" className="p-4 text-muted">
+                          {product.sku}
+                        </td>
 
-                        <td className="p-4">{product.category}</td>
+                        <td data-label="Category" className="p-4">
+                          {product.category}
+                        </td>
 
-                        <td className="p-4">{formatPrice(product.price)}</td>
+                        <td data-label="Price" className="p-4">
+                          {formatPrice(product.price)}
+                        </td>
 
-                        <td className="p-4">{product.quantity}</td>
+                        <td data-label="Quantity" className="p-4">
+                          {product.quantity}
+                        </td>
 
-                        <td className="p-4">
+                        <td data-label="Status" className="p-4">
                           <span className={status.style}>{status.label}</span>
                         </td>
 
-                        <td className="p-4">
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowAddForm(false);
-                                setEditingProduct(product);
-                              }}
-                              disabled={deletingId === product._id}
-                              className="flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-blue-400 hover:bg-slate-800 disabled:opacity-50"
-                            >
-                              <Pencil size={16} />
-                              Edit
-                            </button>
+                        {canManage && (
+                          <td data-label="Actions" className="p-4">
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setShowAddForm(false);
+                                  setEditingProduct(product);
+                                }}
+                                disabled={deletingId === product._id}
+                                className="flex items-center gap-2 rounded-lg border border-line-strong px-3 py-2 text-accent hover:bg-raised disabled:opacity-50"
+                              >
+                                <Pencil size={16} />
+                                Edit
+                              </button>
 
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteProduct(product)}
-                              disabled={deletingId !== null}
-                              className="flex items-center gap-2 rounded-lg border border-red-900 px-3 py-2 text-red-400 hover:bg-red-950 disabled:opacity-50"
-                            >
-                              <Trash2 size={16} />
-                              {deletingId === product._id
-                                ? "Deleting..."
-                                : "Delete"}
-                            </button>
-                          </div>
-                        </td>
+                              {canDelete && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteProduct(product)}
+                                  disabled={deletingId !== null}
+                                  className="flex items-center gap-2 rounded-lg border border-danger/30 px-3 py-2 text-danger hover:bg-danger/10 disabled:opacity-50"
+                                >
+                                  <Trash2 size={16} />
+                                  {deletingId === product._id
+                                    ? "Deleting..."
+                                    : "Delete"}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
@@ -300,7 +320,7 @@ function Products() {
             </table>
 
             {!loading && !error && filteredProducts.length === 0 && (
-              <p className="py-10 text-center text-slate-400">
+              <p className="py-10 text-center text-muted">
                 {products.length === 0
                   ? "No products in the database yet."
                   : "No matching products found."}
