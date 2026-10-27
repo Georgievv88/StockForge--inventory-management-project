@@ -209,16 +209,16 @@ async function createInvitation(req, res) {
     });
     const invitationUrl = new URL(
       "/register",
-      process.env.FRONTEND_URL || "http://localhost:5173",
+      process.env.FRONTEND_URL ||
+        process.env.RENDER_EXTERNAL_URL ||
+        "http://localhost:5173",
     );
     invitationUrl.searchParams.set("token", token);
-    return res
-      .status(201)
-      .json({
-        invitationUrl: invitationUrl.toString(),
-        expiresAt,
-        email: normalizedEmail,
-      });
+    return res.status(201).json({
+      invitationUrl: invitationUrl.toString(),
+      expiresAt,
+      email: normalizedEmail,
+    });
   } catch {
     return res.status(500).json({ message: "Failed to create invitation" });
   }

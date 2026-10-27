@@ -166,7 +166,7 @@ async function main() {
     });
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.route("http://localhost:5000/api/**", async (route) => {
+    await page.route(/^http:\/\/localhost:(5000|5178)\/api\//, async (route) => {
       const url = new URL(route.request().url());
       const response = await route.fetch({
         url: `http://127.0.0.1:${api.address().port}${url.pathname}${url.search}`,
