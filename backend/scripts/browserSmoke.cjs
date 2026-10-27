@@ -226,7 +226,7 @@ async function main() {
     await page.getByRole("button", { name: "Export inventory CSV" }).click();
     assert.equal(
       (await download).suggestedFilename(),
-      "stockforge-inventory.csv",
+      "stockify-inventory.csv",
     );
     const output = path.resolve(__dirname, "../../artifacts");
     fs.mkdirSync(output, { recursive: true });
@@ -265,7 +265,7 @@ async function main() {
       "false",
     );
     assert.equal(
-      await page.evaluate(() => localStorage.getItem("stockforge-theme")),
+      await page.evaluate(() => localStorage.getItem("stockify-theme")),
       "light",
     );
     await page.screenshot({
@@ -350,7 +350,7 @@ async function main() {
     });
     for (const theme of ["light", "dark"]) {
       await page.evaluate(
-        (value) => localStorage.setItem("stockforge-theme", value),
+        (value) => localStorage.setItem("stockify-theme", value),
         theme,
       );
       for (const width of [320, 390, 768]) {

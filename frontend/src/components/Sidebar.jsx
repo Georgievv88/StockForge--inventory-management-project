@@ -42,7 +42,7 @@ function Sidebar() {
       <div className="flex items-center justify-between gap-3 lg:mb-12">
         <Link to="/" className="flex items-center gap-3">
           <Boxes className="text-accent" size={30} />
-          <span className="text-2xl font-bold">StockForge</span>
+          <span className="text-2xl font-bold">Stockify</span>
         </Link>
         <button
           type="button"

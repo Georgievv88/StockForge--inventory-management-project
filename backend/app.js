@@ -23,7 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 app.get("/api/health", (req, res) =>
-  res.json({ message: "StockForge API is running!", status: "success" }),
+  res.json({ message: "Stockify API is running!", status: "success" }),
 );
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/movements", require("./routes/movementRoutes"));

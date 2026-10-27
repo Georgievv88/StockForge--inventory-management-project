@@ -66,7 +66,7 @@ function Register() {
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2">
           <Package size={32} className="text-accent" />
-          <span className="text-3xl font-bold">StockForge</span>
+          <span className="text-3xl font-bold">Stockify</span>
         </Link>
 
         <div className="rounded-xl border border-line bg-surface p-8 shadow-xl">

@@ -10,7 +10,7 @@ export default function Navbar() {
           <span>
             <Boxes size={24} />
           </span>
-          StockForge<span className="logo-period">.</span>
+          Stockify<span className="logo-period"></span>
         </Link>
         <div className="flex items-center gap-5">
           <a href="#features" className="nav-features">

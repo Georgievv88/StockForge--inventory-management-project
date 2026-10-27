@@ -1,4 +1,4 @@
-# StockForge frontend
+# Stockify frontend
 
 React + Vite. See [the project README](../README.md) for setup, permissions, completed features, and the review checklist.
 

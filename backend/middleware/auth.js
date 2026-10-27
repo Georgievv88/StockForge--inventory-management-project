@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 async function requireAuth(req, res, next) {
-  const token = req.cookies?.stockforge_token;
+  const token = req.cookies?.stockify_token;
   if (!token) return res.status(401).json({ message: "Please sign in" });
   let payload;
   try {

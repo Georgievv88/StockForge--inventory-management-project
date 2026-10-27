@@ -70,7 +70,7 @@ async function request(path, { method = "GET", body, cookie, origin } = {}) {
     cookie: response.headers.get("set-cookie"),
   };
 }
-const adminCookie = () => `stockforge_token=${token()}`;
+const adminCookie = () => `stockify_token=${token()}`;
 
 before(async () => {
   passwordHash = await bcrypt.hash("valid-password-123", 4);
@@ -179,13 +179,13 @@ test("expired and tampered sessions are rejected", async () => {
   assert.equal(
     (
       await request("/auth/me", {
-        cookie: `stockforge_token=${token({ expiresIn: -1 })}`,
+        cookie: `stockify_token=${token({ expiresIn: -1 })}`,
       })
     ).status,
     401,
   );
   assert.equal(
-    (await request("/auth/me", { cookie: "stockforge_token=invalid" })).status,
+    (await request("/auth/me", { cookie: "stockify_token=invalid" })).status,
     401,
   );
 });

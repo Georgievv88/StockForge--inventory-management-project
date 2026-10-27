@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ThemeContext } from "./context";
 function initialTheme() {
   try {
-    return localStorage.getItem("stockforge-theme") === "light"
+    return localStorage.getItem("stockify-theme") === "light"
       ? "light"
       : "dark";
   } catch {
@@ -14,14 +14,14 @@ export default function ThemeProvider({ children }) {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     try {
-      localStorage.setItem("stockforge-theme", theme);
+      localStorage.setItem("stockify-theme", theme);
     } catch {
       /* Theme works without storage. */
     }
   }, [theme]);
   useEffect(() => {
     const sync = (event) => {
-      if (event.key === "stockforge-theme")
+      if (event.key === "stockify-theme")
         setTheme(event.newValue === "light" ? "light" : "dark");
     };
     window.addEventListener("storage", sync);

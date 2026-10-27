@@ -144,7 +144,7 @@ async function login(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: "8h", algorithm: "HS256" },
     );
-    res.cookie("stockforge_token", token, {
+    res.cookie("stockify_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -171,7 +171,7 @@ async function login(req, res) {
 }
 
 function logout(req, res) {
-  res.clearCookie("stockforge_token", {
+  res.clearCookie("stockify_token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",

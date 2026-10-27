@@ -1,4 +1,4 @@
-# StockForge
+# Stockify
 
 Inventory management with React, Express, and MongoDB.
 

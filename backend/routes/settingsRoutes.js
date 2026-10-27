@@ -50,7 +50,7 @@ router.post("/password", async (req, res) => {
     return res
       .status(409)
       .json({ message: "Your account changed. Sign in again and retry." });
-  res.clearCookie("stockforge_token", {
+  res.clearCookie("stockify_token", {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

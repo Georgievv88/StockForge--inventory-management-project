@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Package,
   Search,
-  CircleCheck,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../auth/context";
@@ -78,7 +77,7 @@ export default function Landing() {
             >
               <div className="preview-topbar">
                 <span className="flex items-center gap-2 font-semibold">
-                  <Boxes size={20} /> StockForge
+                  <Boxes size={20} /> Stockify
                 </span>
                 <span className="preview-pill">WORKSPACE PREVIEW</span>
               </div>
@@ -267,14 +266,14 @@ export default function Landing() {
             to={user ? "/dashboard" : "/login"}
             className="primary hero-cta"
           >
-            {user ? "Go to dashboard" : "Open StockForge"}
+            {user ? "Go to dashboard" : "Open Stockify"}
             <ArrowUpRight size={18} />
           </Link>
         </section>
       </main>
       <footer className="landing-container landing-footer">
         <Link to="/" className="flex items-center gap-2 font-bold">
-          <Boxes size={20} /> StockForge
+          <Boxes size={20} /> Stockify
         </Link>
         <p>Inventory in order. Team in sync.</p>
         <a href="#features">

@@ -24,7 +24,7 @@ export default function Reports() {
   function exportRows(lowStock = false) {
     const rows = lowStock ? report.lowStock : report.products;
     downloadCsv(
-      lowStock ? "stockforge-low-stock.csv" : "stockforge-inventory.csv",
+      lowStock ? "stockify-low-stock.csv" : "stockify-inventory.csv",
       [
         [
           "SKU",
